@@ -1,25 +1,25 @@
 import {
   Mail,
   Github,
-  Facebook,
+  // Facebook,
   Youtube,
-  Linkedin,
-  Twitter,
-  Mastodon,
-  Threads,
-  Instagram,
+  // Linkedin,
+  // Twitter,
+  // Mastodon,
+  // Threads,
+  // Instagram,
 } from './icons'
 
 const components = {
   mail: Mail,
   github: Github,
-  facebook: Facebook,
+  // facebook: Facebook,
   youtube: Youtube,
-  linkedin: Linkedin,
-  twitter: Twitter,
-  mastodon: Mastodon,
-  threads: Threads,
-  instagram: Instagram,
+  // linkedin: Linkedin,
+  // twitter: Twitter,
+  // mastodon: Mastodon,
+  // threads: Threads,
+  // instagram: Instagram,
 }
 
 type SocialIconProps = {

@@ -1,0 +1,61 @@
+---
+title: tailwind-nextjs-starter-blog으로 블로그 만들기
+date: '2024-03-04'
+tags: ['next-js', 'tailwind']
+draft: false
+summary: tailwind-nextjs-starter-blog 프로젝트 생성 & 배포
+---
+
+## Introduction
+
+Welcome to the release of Tailwind Nextjs Starter Blog template v2.0. This release is a major refactor of the codebase to support Nextjs App directory and React Server Components. Read on to discover the new features and how to migrate from V1.
+
+<TOCInline toc={props.toc} exclude="Introduction" />
+
+## Repository 만들기
+
+![create repository](/static/images/24_03/create.png)
+
+- 우상단에 있는 Use this template -> Create a new repository 클릭
+
+![create repository](/static/images/24_03/create2.png)
+
+- repository 이름은 보통 자신의 아이디와 같게 합니다.
+- 사이트 생성에 전반적인 부분이 저 repository 이름으로 들어가게 되는 것들이 있어서 맞춰주는게 좋다고 생각합니다. 👍
+
+## 로컬 프로젝트로 가져오기
+
+1. 내 github에 가서 clone
+2. <b> 에러 발생했던 내용</b>
+   ![error](/static/images/24_03/yarn.png)
+
+- npm으로 설치를 하니 에러가 발생.
+- 템플릿을 yarn으로 설치하라는 Read me 가 있었다.
+
+  - Read me 잘 확인하기 🫡
+
+## 배포 (Vercel)
+
+![vercel Import](/static/images/24_03/vercel.png)
+
+- vercel 접속한 후 생성된 프로젝트 Import
+
+![nextBuild](/static/images/24_03/nextOption.png)
+
+- 다른 옵션은 필요 없다. next 프로젝트이기 때문에 'next build' 옵션만 커맨드로 넣어주고 Save
+
+## 에러 History
+
+Github Pages로 페이지를 만드려고 했더니 에러가 계속 발생했다.
+
+1.  next.config.js의 output:'export'를 추가해줘야한다.
+2.  Next 14는 next config yml 파일의 `Static HTML ~~~~ next export` 옵션이 필요없다고 한다.
+3.  나는 13을 사용중인데 git setting에서 yml 파일을 수정하려 해도 수정이 안된다는 에러를 계속 던졌다.
+
+    - git 에서 계속 이슈가 생성되는 내용인데 실시간으로 계속해서 수정할 수 없다는 에러가 발생한다고 한다.(아직 명확한 방법을 찾지 못한거 같다.)
+
+4.  그래서 직접 프로젝트에서 .github/workflow/yml 파일에서 위 내용을 지워서 push를 했더니 static 파일들을 정상적으로 불러오지 못해서 스타일이 다 꺠져버렸다.
+
+<div>
+  <b>vercel 배포를 추천한다. 쉽고 빠르고 편하다.</b>
+</div>
