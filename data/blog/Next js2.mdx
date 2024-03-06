@@ -1,0 +1,153 @@
+---
+title: Next 한 발짝 [24.03.06]
+date: '2024-03-06'
+tags: ['next-js']
+draft: false
+summary: Next js 정복기(개발하면서 기억해야 할 것들)
+---
+
+## Introduction
+
+메타데이터, 404 notfound, Suspense, 캐시 유효성 검사
+
+<TOCInline toc={props.toc} exclude="Introduction" />
+
+## 메타데이터
+
+### 일반
+
+- nextjs에서 metadata라는 이름의 상수로 export 되고 있는 값들은 모든 page, layout에서 찾아낸다.
+- metadata 필드를 지정할 수 있다.
+- meta 데이터 공식문서에서 사용할 수 있는 모든 필드에 대한 설명이 있다.
+- ex.검색엔진이 크롤링할 수 있게, 페이지 링크를 x나 인스타그램에 공유할 때 보여주기도 한다.
+
+- 만약 layout에 metadata를 추가하면 layout이 감싸고 있는 모든 페이지에 자동으로 적용된다.
+- page에 metadata가 있다면 page 의 metadata가 우선 적용된다.
+- 중첩된 layout에 metadata가 존재한다면 layout 의 metadata가 우선 적용된다.
+
+### 동적
+
+- 동적 페이지에서의 metadata는 metadata라는 이름의 변수나 상수를 export 하는게 아니라
+- generateMetadata 라는 async 함수를 export 하여 메타데이터를 등록한다.
+- metadata로 지정이 되어있는 것처럼 generateMetadata라는 함수명으로 똑같이 작성해야한다.
+- 이 함수는 페이지 컴포넌트가 속성으로 받는 것과 동일하게 똑같은 데이터를 받는다.
+
+```js
+export async function generateMetadata({ params }) {
+  const meal = getMeal(params.mealSlug)
+  // 에러가 아니라 페이지가 없을떄 notFound 함수 사용
+
+  if (!meal) {
+    //notFound()
+  }
+
+  return {
+    title: meal.title,
+    description: meal.summary,
+  }
+}
+```
+
+- 유효하지않은 페이지로 이동했을때 메타데이터는 처음에 만들어지기 때문에 notfund가 아니라 error 페이지를 노출한다.
+
+### 404
+
+- not-found
+- notFound - next/navigatioin 페이지를 사용한다.
+- 디렉토리 별로 만들어서 사용 할 수 있다.
+
+## Suspense
+
+```
+import Link from "next/link";
+import classes from "./page.module.css";
+import MealsGrid from "@/components/meals/meals-grid";
+import { getMeals } from "@/lib/meals";
+import { Suspense } from "react";
+
+export const metadata = {
+  title: "All Meals",
+  description: "Browse the delicious meals shared by our vibrant community",
+};
+
+async function Meals() {
+  const meals = await getMeals();
+  return <MealsGrid meals={meals} />;
+}
+
+export default function MealsPage() {
+  // console.log("meals ===>", meals);
+  return (
+    <>
+      <header className={classes.header}>
+        <h1>
+          Delicious meals, created
+          <br />
+          <span className={classes.highlight}>by you</span>
+        </h1>
+        <p>
+          Chhose your favorite recipe and cook it yourself. It is easy and fun!
+        </p>
+        <p className={classes.cta}>
+          <Link href="/meals/share">Share Your Favorite Recipe</Link>
+        </p>
+      </header>
+      <main className={classes.main}>
+        {/* <MealsGrid meals={meals} /> */}
+        <Suspense fallback={<p className={classes.loading}>Fetching meals</p>}>
+          <Meals />
+        </Suspense>
+      </main>
+    </>
+  );
+}
+
+```
+
+- 위의 내용은 먼저 노출되고 Suspense 로 감싸진 부분은 특정 작업이 끝나면 출력이 된다.
+- fallback 작업이 끝날때까지 fallback 내용을 보여준다.
+- 비동기 데이터를 받아올때 useEffect를 사용해야했었는데 대신 서버 컴포넌트에서 훅 없이 사용할수있다.
+
+## 캐시의 유효성 검사
+
+```js
+import { revalidatePath } from 'next/cache'
+
+export async function shareMeal(prevState, formData) {
+  const meal = {
+    title: formData.get('title'),
+    summary: formData.get('summary'),
+    instructions: formData.get('instructions'),
+    image: formData.get('image'),
+    creator: formData.get('name'),
+    creator_email: formData.get('email'),
+  }
+  if (
+    isInvalidText(meal.title) ||
+    isInvalidText(meal.summary) ||
+    isInvalidText(meal.instructions) ||
+    isInvalidText(meal.creator) ||
+    isInvalidText(meal.creator_email) ||
+    !meal.creator_email.includes('@') ||
+    !meal.image ||
+    meal.image.size === 0
+  ) {
+    // throw new Error("Invalid Input");
+    return {
+      message: 'Invaild Input',
+    }
+  }
+  await saveMeal(meal)
+  revalidatePath('/meals')
+
+  redirect(`/meals`)
+}
+```
+
+- 정적 리소스에 대한 캐시를 비우라는 next js 제공 함수
+- 특정 경로에 속하는 캐시의 유효성 재검사(revalidate)를 하게 된다.
+- 기본값은 page로 해당 경로의 page.js 를 재검사 하겠다.
+- layout을 두번째 인자로 주면 중첩된 path까지 revalidate 할 수 있다.
+- ex. /meals/[mealSlug]
+- revalidatePath("/meals", "layout");
+- revalidatePath("/meals",'page');

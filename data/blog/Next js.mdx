@@ -95,6 +95,7 @@ export default function MealItem({ title, slug, image, summary, creator }) {
 ## useFormState
 
 ```js
+
 'use client'
 import { useFormState } from 'react-dom'
 import ImagePicker from '@/components/meals/image-picker'
@@ -130,7 +131,22 @@ export default function ShareMealPage() {
     </>
   )
 }
+
+export default function ShareMealPage() {
+  const [formState, formAction] = useFormState(shareMeal, { message: null });
+    return (
+    <>
+            {formState.message && <p>{formState.message}</p>}
+          <p className={classes.actions}>
+            <MealsFormSubmit />
+          </p>
+         </>
+  );
+}
+
 ```
+
+- formState의 상태를 사용할 수 있다.
 
 ## 아웃소싱
 
@@ -303,3 +319,4 @@ export async function shareMeal(prevState, formData) {
 ```
 
 - 서버 컴포넌트에서 처리
+- 유효성 검사의 조건을 탔을때 return message를 해서 formState.message를 노출 시켜줄 수 있다.
